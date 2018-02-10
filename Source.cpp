@@ -14,13 +14,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     int mx=0, my=0;   //マウス座標
     int mouse;      //マウスの状態
     int i=0;  //配列NO.
-    int no=10;
-
+    bool check;
     CRectangle rect[10];
 
 
     // メインループ
-    while (ScreenFlip() == 0 && ProcessMessage() == 0 && ClearDrawScreen() == 0 ){
+    while (ScreenFlip() == 0 && ProcessMessage() == 0 && ClearDrawScreen() == 0) {
 
 
         // マウスを表示状態にする
@@ -38,29 +37,42 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
             x2 = mx;
             y2 = my;
             flag++;
-            if (i < no) { i++; }
+
+            for (i = 0; i < 10; i++) {
+                check = rect[i].check(x1, y1, x2, y2);
+                if (check == false) {
+                    flag = 1;
+                }
+                else { flag = 0; }
+            }
         }//ドラッグ中
-        if (flag == 1) {
-            x2 = mx;
-            y2 = my;
+        if (check == false) {
 
-            DrawBox(x1, y1, x2, y2, GetColor(255, 255, 255), 0);//四角形の描画
-        }
+            if (flag == 1) {
+                x2 = mx;
+                y2 = my;
 
-        //ドラッグを終えたとき
-        if ((mouse & MOUSE_INPUT_LEFT) == 0 ){
-            flag = 0;
-            rect[i-1].get_pos(x1, y1, x2, y2);
-           
-        }
-        for (int j = 0; j <= i; j++) {
-            rect[j].show();
-        }
-        //DrawBox(x1, y1, x2, y2, GetColor(255, 255, 255), 0);//四角形の描画
+                DrawBox(x1, y1, x2, y2, GetColor(255, 255, 255), 0);//四角形の描画
+            }
 
-    // DrawFormatString(0, 0, GetColor(255, 255, 255), "[%d,%d,%d,%d]", x1, y1, x2, y2);
-    //DrawFormatString(0, 20, GetColor(255, 255, 255), "[%d,%d]", mx, my);
-    }
+            //ドラッグを終えたとき
+            if ((mouse & MOUSE_INPUT_LEFT) == 0) {
+                flag = 0;
+                if (rect[i].flag == false) {
+                    rect[i - 1].get_pos(x1, y1, x2, y2);
+                }
+            }
+        }
+            for (int j = 0; j <= 10; j++) {
+                if (rect[j].flag == true) {
+                    rect[j].show();
+                }
+
+            }
+        }
+    
+
+
 
     DxLib_End(); // DXライブラリ終了処理
     return 0;
